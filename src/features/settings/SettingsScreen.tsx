@@ -7,6 +7,7 @@ import { Select } from '../../components/ui/Select'
 import { Toggle } from '../../components/ui/Toggle'
 import { AmountInput } from '../../components/ui/AmountInput'
 import { updateSettings } from '../../db/db'
+import { resetAllData } from '../../db/backup'
 import { recalculateActivePeriodCommitments, updateActivePeriodSalary } from '../../db/periodService'
 import { applyLanguage } from '../../i18n'
 import { computeWeeklyBudgetStreak } from '../../domain/streak'
@@ -89,6 +90,12 @@ export function SettingsScreen() {
     } else {
       await updateSettings({ notificationsEnabled: false })
     }
+  }
+
+  async function handleClearData() {
+    if (!confirm(t('settings.clearDataConfirm'))) return
+    await resetAllData()
+    window.location.reload()
   }
 
   return (
@@ -195,6 +202,16 @@ export function SettingsScreen() {
       <section className="space-y-3">
         <h2 className="text-sm font-semibold text-ink-soft">{t('settings.profiles')}</h2>
         <ProfileSection />
+      </section>
+
+      <section className="space-y-3">
+        <h2 className="text-sm font-semibold text-danger-strong">{t('settings.dangerZone')}</h2>
+        <Card variant="surface" className="space-y-3">
+          <p className="text-xs text-muted">{t('settings.clearDataHint')}</p>
+          <Pill variant="outline" className="w-full border-danger-strong text-danger-strong" onClick={handleClearData}>
+            {t('settings.clearData')}
+          </Pill>
+        </Card>
       </section>
 
       <MarkSalaryReceivedSheet

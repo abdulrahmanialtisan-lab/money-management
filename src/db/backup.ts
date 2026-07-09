@@ -66,6 +66,22 @@ export async function importAllData(json: string): Promise<void> {
   )
 }
 
+export async function resetAllData(): Promise<void> {
+  await db.transaction(
+    'rw',
+    [db.settings, db.commitments, db.spendingItems, db.transactions, db.payPeriods],
+    async () => {
+      await Promise.all([
+        db.settings.clear(),
+        db.commitments.clear(),
+        db.spendingItems.clear(),
+        db.transactions.clear(),
+        db.payPeriods.clear(),
+      ])
+    },
+  )
+}
+
 export function downloadBackupFile(json: string, filename?: string): void {
   const blob = new Blob([json], { type: 'application/json' })
   const url = URL.createObjectURL(blob)
