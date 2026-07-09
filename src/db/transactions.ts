@@ -8,7 +8,7 @@ export interface AddTransactionInput {
   date?: string
   note?: string
   spendingItemId?: string
-  newItem?: { name: string; importance: Importance; icon: string; color: string }
+  newItem?: { name: string; importance: Importance; icon: string; color: string; saveToLibrary: boolean }
 }
 
 async function findPeriodIdForDate(date: string): Promise<string> {
@@ -27,7 +27,7 @@ export async function addTransaction(input: AddTransactionInput): Promise<void> 
   let itemName: string
   let importance: ImportanceOrUnclassified
 
-  if (!spendingItemId && input.newItem) {
+  if (!spendingItemId && input.newItem?.saveToLibrary) {
     const id = makeId()
     await db.spendingItems.add({
       id,
@@ -42,6 +42,10 @@ export async function addTransaction(input: AddTransactionInput): Promise<void> 
       updatedAt: now,
     })
     spendingItemId = id
+    itemName = input.newItem.name
+    importance = input.newItem.importance
+  } else if (!spendingItemId && input.newItem) {
+    // One-off entry: keep the typed name + importance on the transaction only, no library row.
     itemName = input.newItem.name
     importance = input.newItem.importance
   } else if (spendingItemId) {

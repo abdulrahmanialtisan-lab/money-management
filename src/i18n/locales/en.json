@@ -2,6 +2,7 @@
   "nav": {
     "home": "Home",
     "calendar": "Calendar",
+    "spending": "Spending",
     "items": "Items",
     "reports": "Reports",
     "settings": "Settings"
@@ -47,6 +48,7 @@
   },
   "home": {
     "leftBalance": "Left balance",
+    "bankBalance": "Bank account balance",
     "totalExpensed": "Total Expensed",
     "weeklyBudget": "Weekly budget",
     "thisWeek": "This week",
@@ -80,7 +82,8 @@
     "pasteBankMessagePlaceholder": "Paste the bank notification text here…",
     "parseMessage": "Parse message",
     "parseNoAmount": "Couldn't find an amount in that message",
-    "parseNoMerchant": "Got the amount — pick or type the item yourself"
+    "parseNoMerchant": "Got the amount — pick or type the item yourself",
+    "saveToLibrary": "Save to my items list"
   },
   "items": {
     "title": "Spending Items",
@@ -136,6 +139,13 @@
     "vsLastPeriod": "{{direction}} {{pct}}% vs last period",
     "currentPeriod": "Current period",
     "pastPeriods": "Past periods"
+  },
+  "spending": {
+    "title": "My Spending",
+    "weeklySpend": "Your weekly spend",
+    "budget": "budget",
+    "lessThanLastWeek": "{{amount}} less than last week",
+    "moreThanLastWeek": "{{amount}} more than last week"
   },
   "toast": {
     "expenseAdded": "Expense added",

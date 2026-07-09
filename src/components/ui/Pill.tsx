@@ -15,7 +15,9 @@ export function Pill({ variant = 'dark', size = 'md', className, children, ...re
         size === 'md' && 'h-12 px-5 text-sm',
         size === 'sm' && 'h-9 px-4 text-xs',
         variant === 'dark' && 'bg-ink text-bg',
-        variant === 'accent' && 'bg-accent text-ink',
+        // accent bg is a fixed brand color (same hex in both themes), so its
+        // text must be fixed too, not the theme-relative `ink` token.
+        variant === 'accent' && 'bg-accent text-[#0b0f0d]',
         variant === 'outline' && 'border border-border bg-transparent text-ink',
         variant === 'ghost' && 'bg-surface-2 text-ink',
         className,

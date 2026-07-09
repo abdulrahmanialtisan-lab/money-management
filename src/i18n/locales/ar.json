@@ -2,6 +2,7 @@
   "nav": {
     "home": "الرئيسية",
     "calendar": "التقويم",
+    "spending": "صرفياتك",
     "items": "الأصناف",
     "reports": "التقارير",
     "settings": "الإعدادات"
@@ -47,6 +48,7 @@
   },
   "home": {
     "leftBalance": "الرصيد المتبقي",
+    "bankBalance": "رصيد حسابك البنكي",
     "totalExpensed": "إجمالي المصروف",
     "weeklyBudget": "الميزانية الأسبوعية",
     "thisWeek": "هذا الأسبوع",
@@ -80,7 +82,8 @@
     "pasteBankMessagePlaceholder": "الصق نص إشعار البنك هنا…",
     "parseMessage": "تحليل الرسالة",
     "parseNoAmount": "ما قدرت ألقى مبلغاً في هذه الرسالة",
-    "parseNoMerchant": "حصلت على المبلغ — اختر أو اكتب الصنف بنفسك"
+    "parseNoMerchant": "حصلت على المبلغ — اختر أو اكتب الصنف بنفسك",
+    "saveToLibrary": "حفظ في قائمة أصنافي"
   },
   "items": {
     "title": "الأصناف",
@@ -136,6 +139,13 @@
     "vsLastPeriod": "{{direction}} {{pct}}% عن الفترة الماضية",
     "currentPeriod": "الفترة الحالية",
     "pastPeriods": "الفترات السابقة"
+  },
+  "spending": {
+    "title": "صرفياتك",
+    "weeklySpend": "صرفك الأسبوعي",
+    "budget": "الميزانية",
+    "lessThanLastWeek": "أقل بـ {{amount}} من الأسبوع الماضي",
+    "moreThanLastWeek": "أكثر بـ {{amount}} من الأسبوع الماضي"
   },
   "toast": {
     "expenseAdded": "تمت إضافة المصروف",

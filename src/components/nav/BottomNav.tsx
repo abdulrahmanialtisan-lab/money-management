@@ -1,4 +1,4 @@
-import { CalendarDays, Home, Plus, Settings2, Tags, PieChart } from 'lucide-react'
+import { CalendarDays, Home, Plus, Settings2, Tags, PieChart, Wallet } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { NavLink } from 'react-router-dom'
 import { useUiStore } from '../../state/uiStore'
@@ -7,6 +7,7 @@ import { cn } from '../../utils/cn'
 const TABS = [
   { to: '/', key: 'home', Icon: Home },
   { to: '/calendar', key: 'calendar', Icon: CalendarDays },
+  { to: '/spending', key: 'spending', Icon: Wallet },
   { to: '/items', key: 'items', Icon: Tags },
   { to: '/reports', key: 'reports', Icon: PieChart },
   { to: '/settings', key: 'settings', Icon: Settings2 },
@@ -16,8 +17,8 @@ export function BottomNav() {
   const { t } = useTranslation()
   const openAddExpense = useUiStore((s) => s.openAddExpense)
 
-  const leftTabs = TABS.slice(0, 2)
-  const rightTabs = TABS.slice(2)
+  const leftTabs = TABS.slice(0, 3)
+  const rightTabs = TABS.slice(3)
 
   return (
     <nav className="fixed inset-x-0 bottom-0 z-40 mx-auto flex w-full max-w-md items-center justify-between gap-1 border-t border-border bg-surface px-3 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2">

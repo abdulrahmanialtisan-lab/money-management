@@ -8,7 +8,7 @@ import { CategoryBreakdown } from './CategoryBreakdown'
 import { WeeklyActualsChart } from './WeeklyActualsChart'
 import { HistoryList } from './HistoryList'
 import { Select } from '../../components/ui/Select'
-import { fromDateKey } from '../../utils/date'
+import { dateLocale, fromDateKey } from '../../utils/date'
 
 export function ReportsScreen() {
   const { t } = useTranslation()
@@ -54,7 +54,7 @@ export function ReportsScreen() {
 
   const periodOptions = (allPeriods ?? []).map((p) => ({
     value: p.id,
-    label: `${fromDateKey(p.startDate).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US', { month: 'short', day: 'numeric' })} — ${fromDateKey(p.endDate).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US', { month: 'short', day: 'numeric' })}${p.status === 'active' ? ` (${t('reports.currentPeriod')})` : ''}`,
+    label: `${fromDateKey(p.startDate).toLocaleDateString(dateLocale(language), { month: 'short', day: 'numeric' })} — ${fromDateKey(p.endDate).toLocaleDateString(dateLocale(language), { month: 'short', day: 'numeric' })}${p.status === 'active' ? ` (${t('reports.currentPeriod')})` : ''}`,
   }))
 
   return (
