@@ -59,7 +59,9 @@
     "goToSettings": "الذهاب للإعدادات",
     "overspentWeek": "تجاوزت ميزانية هذا الأسبوع",
     "daysLeftInWeek": "باقي {{count}} أيام على هذا الأسبوع",
-    "periodEnds": "تنتهي الفترة في {{date}}"
+    "periodEnds": "تنتهي الفترة في {{date}}",
+    "rolloverSurplus": "+{{amount}} مُرحّلة من الأسبوع الماضي",
+    "rolloverDeficit": "-{{amount}} مخصومة بسبب تجاوز الأسبوع الماضي"
   },
   "expense": {
     "addExpense": "إضافة مصروف",

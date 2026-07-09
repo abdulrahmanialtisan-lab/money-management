@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { allocateWeeklyBudgets, buildWeeks, computeWeeks } from '../../src/domain/weeklyBudget'
+import { allocateWeeklyBudgets, buildWeeks, computeRolledOverBudgets, computeWeeks } from '../../src/domain/weeklyBudget'
 
 describe('buildWeeks', () => {
   it('produces a single partial first week and partial last week when period does not align to week start', () => {
@@ -39,6 +39,36 @@ describe('allocateWeeklyBudgets', () => {
     const budgets = allocateWeeklyBudgets(weeks, 100)
     const sum = budgets.reduce((a, b) => a + b, 0)
     expect(Math.round(sum * 100) / 100).toBe(100)
+  })
+})
+
+describe('computeRolledOverBudgets', () => {
+  it('carries an unspent surplus into the next week', () => {
+    const weeks = [{ budget: 500 }, { budget: 500 }]
+    const actuals = [300, 0]
+    const effective = computeRolledOverBudgets(weeks, actuals)
+    expect(effective[0]).toBe(500)
+    expect(effective[1]).toBe(700) // 500 + (500-300) leftover from week 1
+  })
+
+  it('tightens the next week after overspending', () => {
+    const weeks = [{ budget: 500 }, { budget: 500 }]
+    const actuals = [650, 0]
+    const effective = computeRolledOverBudgets(weeks, actuals)
+    expect(effective[1]).toBe(350) // 500 - 150 overspend from week 1
+  })
+
+  it('cascades a surplus across multiple untouched future weeks', () => {
+    const weeks = [{ budget: 200 }, { budget: 200 }, { budget: 200 }]
+    const actuals = [0, 0, 0]
+    const effective = computeRolledOverBudgets(weeks, actuals)
+    expect(effective).toEqual([200, 400, 600])
+  })
+
+  it('is a no-op when every week is spent exactly to budget', () => {
+    const weeks = [{ budget: 300 }, { budget: 300 }, { budget: 300 }]
+    const actuals = [300, 300, 300]
+    expect(computeRolledOverBudgets(weeks, actuals)).toEqual([300, 300, 300])
   })
 })
 

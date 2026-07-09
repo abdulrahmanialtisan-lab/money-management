@@ -59,7 +59,9 @@
     "goToSettings": "Go to settings",
     "overspentWeek": "You're over this week's budget",
     "daysLeftInWeek": "{{count}} days left this week",
-    "periodEnds": "Period ends {{date}}"
+    "periodEnds": "Period ends {{date}}",
+    "rolloverSurplus": "+{{amount}} rolled over from last week",
+    "rolloverDeficit": "-{{amount}} carried over from overspending"
   },
   "expense": {
     "addExpense": "Add expense",

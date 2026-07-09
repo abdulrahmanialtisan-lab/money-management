@@ -6,15 +6,17 @@ import { formatAmount } from '../../utils/currency'
 interface WeeklyBudgetCardProps {
   weekSpent: number
   weekBudget: number
+  plannedBudget: number
   daysLeft: number
   currency: string
   language: 'en' | 'ar'
 }
 
-export function WeeklyBudgetCard({ weekSpent, weekBudget, daysLeft, currency, language }: WeeklyBudgetCardProps) {
+export function WeeklyBudgetCard({ weekSpent, weekBudget, plannedBudget, daysLeft, currency, language }: WeeklyBudgetCardProps) {
   const { t } = useTranslation()
   const pct = weekBudget > 0 ? (weekSpent / weekBudget) * 100 : 0
   const over = weekSpent > weekBudget
+  const rollover = Math.round((weekBudget - plannedBudget) * 100) / 100
 
   return (
     <Card variant="surface" className="flex items-center gap-4">
@@ -30,6 +32,13 @@ export function WeeklyBudgetCard({ weekSpent, weekBudget, daysLeft, currency, la
         <p className={`mt-1 text-xs font-medium ${over ? 'text-danger-strong' : 'text-muted'}`}>
           {over ? t('home.overspentWeek') : t('home.daysLeftInWeek', { count: daysLeft })}
         </p>
+        {rollover !== 0 && (
+          <p className={`mt-0.5 text-xs font-medium ${rollover > 0 ? 'text-accent-strong' : 'text-danger-strong'}`}>
+            {rollover > 0
+              ? t('home.rolloverSurplus', { amount: formatAmount(rollover, currency, language) })
+              : t('home.rolloverDeficit', { amount: formatAmount(Math.abs(rollover), currency, language) })}
+          </p>
+        )}
       </div>
     </Card>
   )

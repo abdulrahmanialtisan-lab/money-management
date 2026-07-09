@@ -72,3 +72,20 @@ export function computeWeeks(
   const budgets = allocateWeeklyBudgets(shell, leftover)
   return shell.map((w, i) => ({ ...w, budget: budgets[i] }))
 }
+
+/**
+ * Carries each week's unused (or overspent) amount into the next week, so an
+ * under-spent week grows the following week's available budget, and an
+ * overspent week tightens it. The running total across the period is
+ * unchanged — this only redistributes when the money becomes available.
+ */
+export function computeRolledOverBudgets(weeks: Array<{ budget: number }>, actuals: number[]): number[] {
+  const effective: number[] = []
+  let carry = 0
+  for (let i = 0; i < weeks.length; i++) {
+    const available = Math.round((weeks[i].budget + carry) * 100) / 100
+    effective.push(available)
+    carry = available - (actuals[i] ?? 0)
+  }
+  return effective
+}

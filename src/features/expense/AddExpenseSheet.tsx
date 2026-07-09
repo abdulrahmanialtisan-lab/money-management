@@ -5,16 +5,21 @@ import { AmountInput } from '../../components/ui/AmountInput'
 import { Pill } from '../../components/ui/Pill'
 import { TextField } from '../../components/ui/TextField'
 import { SearchableCombobox, type ComboboxItem } from '../../components/ui/SearchableCombobox'
-import { IconPicker } from '../../components/ui/IconPicker'
-import { ColorSwatchPicker } from '../../components/ui/ColorSwatchPicker'
 import { useUiStore } from '../../state/uiStore'
 import { useSettingsState, useSpendingItems } from '../../state/settingsQueries'
 import { addTransaction } from '../../db/transactions'
-import { DEFAULT_COLOR, DEFAULT_ICON, ICONS } from '../../icons/categoryIcons'
+import { COLOR_SWATCHES, DEFAULT_ICON, ICONS } from '../../icons/categoryIcons'
 import { today } from '../../utils/date'
 import type { Importance } from '../../domain/types'
 
 type Step = 'pick' | 'newItem'
+
+// Quick-add items skip the icon/color picker: important -> the same green as the
+// verdict color, not important -> the same red. Full customization stays in the
+// Items library, reachable later without losing this expense's classification.
+function colorForImportance(importance: Importance): string {
+  return importance === 'important' ? COLOR_SWATCHES[0] : COLOR_SWATCHES[1]
+}
 
 export function AddExpenseSheet() {
   const { t } = useTranslation()
@@ -32,8 +37,6 @@ export function AddExpenseSheet() {
   const [note, setNote] = useState('')
   const [newItemName, setNewItemName] = useState('')
   const [newItemImportance, setNewItemImportance] = useState<Importance>('important')
-  const [newItemIcon, setNewItemIcon] = useState(DEFAULT_ICON)
-  const [newItemColor, setNewItemColor] = useState(DEFAULT_COLOR)
   const [saving, setSaving] = useState(false)
 
   const currency = settingsState !== 'loading' && settingsState !== 'not-found' ? settingsState.currency : ''
@@ -61,8 +64,6 @@ export function AddExpenseSheet() {
     setNote('')
     setNewItemName('')
     setNewItemImportance('important')
-    setNewItemIcon(DEFAULT_ICON)
-    setNewItemColor(DEFAULT_COLOR)
   }
 
   function handleClose() {
@@ -96,7 +97,12 @@ export function AddExpenseSheet() {
           amount: Number(amount),
           date,
           note: note.trim() || undefined,
-          newItem: { name: newItemName.trim(), importance: newItemImportance, icon: newItemIcon, color: newItemColor },
+          newItem: {
+            name: newItemName.trim(),
+            importance: newItemImportance,
+            icon: DEFAULT_ICON,
+            color: colorForImportance(newItemImportance),
+          },
         })
       } else {
         setSaving(false)
@@ -129,10 +135,10 @@ export function AddExpenseSheet() {
                   label: newItemName.trim(),
                   sublabel: newItemImportance === 'important' ? t('common.important') : t('common.notImportant'),
                   icon: (() => {
-                    const Icon = ICONS[newItemIcon] ?? ICONS[DEFAULT_ICON]
-                    return <Icon size={16} color={newItemColor} />
+                    const Icon = ICONS[DEFAULT_ICON]
+                    return <Icon size={16} color={colorForImportance(newItemImportance)} />
                   })(),
-                  color: `${newItemColor}22`,
+                  color: `${colorForImportance(newItemImportance)}22`,
                 }}
                 onClear={() => setNewItemName('')}
                 onEditLabel={t('common.edit')}
@@ -173,14 +179,6 @@ export function AddExpenseSheet() {
                   {t('common.notImportant')}
                 </Pill>
               </div>
-            </div>
-            <div>
-              <span className="mb-1.5 block text-sm font-medium text-ink-soft">{t('items.icon')}</span>
-              <IconPicker value={newItemIcon} onChange={setNewItemIcon} color={newItemColor} />
-            </div>
-            <div>
-              <span className="mb-1.5 block text-sm font-medium text-ink-soft">{t('items.color')}</span>
-              <ColorSwatchPicker value={newItemColor} onChange={setNewItemColor} />
             </div>
             <div className="flex gap-2">
               <Pill

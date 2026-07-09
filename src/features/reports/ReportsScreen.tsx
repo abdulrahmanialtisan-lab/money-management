@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { computeVerdict, comparePeriods } from '../../domain/verdict'
+import { computeRolledOverBudgets } from '../../domain/weeklyBudget'
 import { useAllPeriods, useSettingsState, useSpendingItems, useTransactionsForPeriod } from '../../state/settingsQueries'
 import { VerdictCard } from './VerdictCard'
 import { CategoryBreakdown } from './CategoryBreakdown'
@@ -48,6 +49,8 @@ export function ReportsScreen() {
   const weeklyActuals = period.weeks.map((w) =>
     (transactions ?? []).filter((tx) => tx.date >= w.startDate && tx.date <= w.endDate).reduce((sum, tx) => sum + tx.amount, 0),
   )
+  const effectiveWeeklyBudgets = computeRolledOverBudgets(period.weeks, weeklyActuals)
+  const weeksWithRollover = period.weeks.map((w, i) => ({ ...w, budget: effectiveWeeklyBudgets[i] }))
 
   const periodOptions = (allPeriods ?? []).map((p) => ({
     value: p.id,
@@ -66,7 +69,7 @@ export function ReportsScreen() {
 
       <div>
         <p className="mb-2 text-sm font-medium text-ink-soft">{t('reports.weeklyActuals')}</p>
-        <WeeklyActualsChart weeks={period.weeks} actuals={weeklyActuals} currency={currency} language={language as 'en' | 'ar'} />
+        <WeeklyActualsChart weeks={weeksWithRollover} actuals={weeklyActuals} currency={currency} language={language as 'en' | 'ar'} />
       </div>
 
       <div>

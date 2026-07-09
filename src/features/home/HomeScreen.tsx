@@ -11,6 +11,7 @@ import {
   useSpendingItems,
   useTransactionsForPeriod,
 } from '../../state/settingsQueries'
+import { computeRolledOverBudgets } from '../../domain/weeklyBudget'
 import { HeroBalanceCard } from './HeroBalanceCard'
 import { WeeklyBudgetCard } from './WeeklyBudgetCard'
 import { QuickAddGrid } from './QuickAddGrid'
@@ -43,12 +44,15 @@ export function HomeScreen() {
       : null
 
   const todayKey = today()
-  const currentWeek =
-    activePeriod.weeks.find((w) => w.startDate <= todayKey && todayKey <= w.endDate) ??
-    activePeriod.weeks[activePeriod.weeks.length - 1]
-  const weekSpent = (periodTransactions ?? [])
-    .filter((tx) => tx.date >= currentWeek.startDate && tx.date <= currentWeek.endDate)
-    .reduce((sum, tx) => sum + tx.amount, 0)
+  const foundWeekIndex = activePeriod.weeks.findIndex((w) => w.startDate <= todayKey && todayKey <= w.endDate)
+  const currentWeekIndex = foundWeekIndex >= 0 ? foundWeekIndex : activePeriod.weeks.length - 1
+  const currentWeek = activePeriod.weeks[currentWeekIndex]
+  const weeklyActuals = activePeriod.weeks.map((w) =>
+    (periodTransactions ?? []).filter((tx) => tx.date >= w.startDate && tx.date <= w.endDate).reduce((sum, tx) => sum + tx.amount, 0),
+  )
+  const effectiveWeeklyBudgets = computeRolledOverBudgets(activePeriod.weeks, weeklyActuals)
+  const weekSpent = weeklyActuals[currentWeekIndex]
+  const weekBudget = effectiveWeeklyBudgets[currentWeekIndex]
   const daysLeft = Math.max(0, diffInDays(todayKey, currentWeek.endDate) + 1)
 
   const periodLabel = fromDateKey(activePeriod.startDate).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US', {
@@ -69,7 +73,14 @@ export function HomeScreen() {
         periodLabel={periodLabel}
       />
 
-      <WeeklyBudgetCard weekSpent={weekSpent} weekBudget={currentWeek.budget} daysLeft={daysLeft} currency={currency} language={language} />
+      <WeeklyBudgetCard
+        weekSpent={weekSpent}
+        weekBudget={weekBudget}
+        plannedBudget={currentWeek.budget}
+        daysLeft={daysLeft}
+        currency={currency}
+        language={language}
+      />
 
       <Link to="/commitments">
         <Pill variant="dark" className="w-full justify-between px-5">
