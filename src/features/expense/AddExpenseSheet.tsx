@@ -5,6 +5,7 @@ import { Sheet } from '../../components/ui/Sheet'
 import { AmountInput } from '../../components/ui/AmountInput'
 import { Pill } from '../../components/ui/Pill'
 import { TextField } from '../../components/ui/TextField'
+import { Toggle } from '../../components/ui/Toggle'
 import { SearchableCombobox, type ComboboxItem } from '../../components/ui/SearchableCombobox'
 import { useUiStore } from '../../state/uiStore'
 import { useSettingsState, useSpendingItems } from '../../state/settingsQueries'
@@ -39,6 +40,7 @@ export function AddExpenseSheet() {
   const [note, setNote] = useState('')
   const [newItemName, setNewItemName] = useState('')
   const [newItemImportance, setNewItemImportance] = useState<Importance>('important')
+  const [saveToLibrary, setSaveToLibrary] = useState(true)
   const [saving, setSaving] = useState(false)
   const [pasteOpen, setPasteOpen] = useState(false)
   const [pasteText, setPasteText] = useState('')
@@ -68,6 +70,7 @@ export function AddExpenseSheet() {
     setNote('')
     setNewItemName('')
     setNewItemImportance('important')
+    setSaveToLibrary(true)
     setPasteOpen(false)
     setPasteText('')
   }
@@ -126,6 +129,7 @@ export function AddExpenseSheet() {
             importance: newItemImportance,
             icon: DEFAULT_ICON,
             color: colorForImportance(newItemImportance),
+            saveToLibrary,
           },
         })
       } else {
@@ -240,6 +244,10 @@ export function AddExpenseSheet() {
                   {t('common.notImportant')}
                 </Pill>
               </div>
+            </div>
+            <div className="flex items-center justify-between rounded-2xl bg-surface-2 px-4 py-3">
+              <span className="text-sm font-medium">{t('expense.saveToLibrary')}</span>
+              <Toggle checked={saveToLibrary} onChange={setSaveToLibrary} />
             </div>
             <div className="flex gap-2">
               <Pill

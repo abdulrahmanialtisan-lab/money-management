@@ -12,12 +12,13 @@ import {
   useTransactionsForPeriod,
 } from '../../state/settingsQueries'
 import { computeRolledOverBudgets } from '../../domain/weeklyBudget'
+import { BankBalanceCard } from './BankBalanceCard'
 import { HeroBalanceCard } from './HeroBalanceCard'
 import { WeeklyBudgetCard } from './WeeklyBudgetCard'
 import { QuickAddGrid } from './QuickAddGrid'
 import { RecentTransactionsList } from './RecentTransactionsList'
 import { formatAmount } from '../../utils/currency'
-import { diffInDays, fromDateKey, today } from '../../utils/date'
+import { dateLocale, diffInDays, fromDateKey, today } from '../../utils/date'
 
 export function HomeScreen() {
   const { t } = useTranslation()
@@ -55,7 +56,7 @@ export function HomeScreen() {
   const weekBudget = effectiveWeeklyBudgets[currentWeekIndex]
   const daysLeft = Math.max(0, diffInDays(todayKey, currentWeek.endDate) + 1)
 
-  const periodLabel = fromDateKey(activePeriod.startDate).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US', {
+  const periodLabel = fromDateKey(activePeriod.startDate).toLocaleDateString(dateLocale(language), {
     month: 'long',
   })
 
@@ -73,6 +74,8 @@ export function HomeScreen() {
         periodLabel={periodLabel}
       />
 
+      <BankBalanceCard bankBalance={settingsState.bankBalance ?? 0} currency={currency} />
+
       <WeeklyBudgetCard
         weekSpent={weekSpent}
         weekBudget={weekBudget}
@@ -83,11 +86,11 @@ export function HomeScreen() {
       />
 
       <Link to="/commitments">
-        <Pill variant="dark" className="w-full justify-between px-5">
+        <Pill variant="dark" className="w-full justify-between bg-[#0b0f0d] px-5 text-[#f5f5f1] ring-1 ring-white/10">
           <span>{t('home.commitmentsQuick')}</span>
           <span className="flex items-center gap-2">
             <span className="text-xs text-white/60">{formatAmount(activePeriod.totalCommitments, currency, language)}</span>
-            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-accent text-ink">
+            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-accent text-[#0b0f0d]">
               <ChevronRight size={14} className="rtl:rotate-180" />
             </span>
           </span>

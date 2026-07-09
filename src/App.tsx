@@ -8,6 +8,7 @@ import { ItemsScreen } from './features/items/ItemsScreen'
 import { ReportsScreen } from './features/reports/ReportsScreen'
 import { SettingsScreen } from './features/settings/SettingsScreen'
 import { CommitmentsScreen } from './features/commitments/CommitmentsScreen'
+import { SpendingScreen } from './features/spending/SpendingScreen'
 import { OnboardingFlow } from './features/onboarding/OnboardingFlow'
 import { Toast } from './components/ui/Toast'
 import { applyLanguage } from './i18n'
@@ -66,6 +67,7 @@ export default function App() {
         <Route path="/reports" element={<ReportsScreen />} />
         <Route path="/settings" element={<SettingsScreen />} />
         <Route path="/commitments" element={<CommitmentsScreen />} />
+        <Route path="/spending" element={<SpendingScreen />} />
       </Routes>
       <BottomNav />
       <AddExpenseSheet />

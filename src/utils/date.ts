@@ -3,6 +3,18 @@
  * as UTC ISO timestamps, so day-boundary math can't drift across timezones.
  */
 
+/**
+ * WebKit/Safari's plain "ar-SA" locale has historically defaulted to the
+ * Islamic Umm-al-Qura calendar for Intl date formatting, unlike other engines.
+ * Pin the calendar and numbering system explicitly so dates render the same
+ * (Gregorian, Western digits) everywhere regardless of browser default.
+ */
+export const AR_DATE_LOCALE = 'ar-SA-u-ca-gregory-nu-latn'
+
+export function dateLocale(language: 'en' | 'ar'): string {
+  return language === 'ar' ? AR_DATE_LOCALE : 'en-US'
+}
+
 export function toDateKey(d: Date): string {
   const y = d.getFullYear()
   const m = String(d.getMonth() + 1).padStart(2, '0')

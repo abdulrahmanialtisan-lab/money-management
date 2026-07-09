@@ -11,6 +11,7 @@ export interface Settings {
   defaultSalaryAmount: number
   importantTargetRatio: number
   notificationsEnabled: boolean
+  bankBalance: number
   onboardingCompleted: boolean
   schemaVersion: number
 }

@@ -35,6 +35,7 @@ export const DEFAULT_SETTINGS: Settings = {
   defaultSalaryAmount: 0,
   importantTargetRatio: 50,
   notificationsEnabled: false,
+  bankBalance: 0,
   onboardingCompleted: false,
   schemaVersion: SCHEMA_VERSION,
 }

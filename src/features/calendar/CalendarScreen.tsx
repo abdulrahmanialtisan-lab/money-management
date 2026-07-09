@@ -4,7 +4,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useSettingsState, useSpendingItems, useTransactionsInRange } from '../../state/settingsQueries'
 import { DEFAULT_ICON, ICONS } from '../../icons/categoryIcons'
 import { formatAmount } from '../../utils/currency'
-import { toDateKey, today } from '../../utils/date'
+import { dateLocale, toDateKey, today } from '../../utils/date'
 import { cn } from '../../utils/cn'
 import { computeVerdict } from '../../domain/verdict'
 import type { Transaction } from '../../domain/types'
@@ -58,7 +58,7 @@ export function CalendarScreen() {
     return Array.from({ length: 7 }, (_, i) => {
       const d = new Date(base)
       d.setDate(base.getDate() + ((weekStartDay + i) % 7))
-      return d.toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US', { weekday: 'narrow' })
+      return d.toLocaleDateString(dateLocale(language), { weekday: 'narrow' })
     })
   }, [weekStartDay, language])
 
@@ -91,7 +91,7 @@ export function CalendarScreen() {
             <ChevronLeft size={16} className="hidden rtl:block" />
           </button>
           <span className="min-w-24 text-center text-sm font-medium">
-            {viewedMonth.toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US', { month: 'long', year: 'numeric' })}
+            {viewedMonth.toLocaleDateString(dateLocale(language), { month: 'long', year: 'numeric' })}
           </span>
           <button type="button" onClick={() => changeMonth(1)} className="flex h-8 w-8 items-center justify-center rounded-full">
             <ChevronLeft size={16} className="rtl:hidden" />
@@ -134,7 +134,7 @@ export function CalendarScreen() {
 
       <div>
         <p className="mb-2 text-sm font-medium text-ink-soft">
-          {selectedDateObj.toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US', { day: 'numeric', month: 'long' })}
+          {selectedDateObj.toLocaleDateString(dateLocale(language), { day: 'numeric', month: 'long' })}
         </p>
         {selectedTx.length === 0 ? (
           <p className="rounded-2xl bg-surface-2 px-4 py-6 text-center text-sm text-muted">{t('calendar.noExpensesThisDay')}</p>
