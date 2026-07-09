@@ -25,7 +25,10 @@ export function useSpendingItems(includeArchived = false): SpendingItem[] | unde
 }
 
 export function useCommitments(): Commitment[] | undefined {
-  return useLiveQuery(() => db.commitments.orderBy('name').toArray(), [])
+  return useLiveQuery(async () => {
+    const all = await db.commitments.toArray()
+    return all.sort((a, b) => a.name.localeCompare(b.name))
+  }, [])
 }
 
 export function useTransactionsForPeriod(periodId: string | undefined): Transaction[] | undefined {
