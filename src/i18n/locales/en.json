@@ -75,7 +75,12 @@
     "notePlaceholder": "Add a note…",
     "save": "Save expense",
     "itemRequired": "Choose or create an item",
-    "amountRequired": "Enter an amount"
+    "amountRequired": "Enter an amount",
+    "pasteBankMessage": "Paste from bank SMS",
+    "pasteBankMessagePlaceholder": "Paste the bank notification text here…",
+    "parseMessage": "Parse message",
+    "parseNoAmount": "Couldn't find an amount in that message",
+    "parseNoMerchant": "Got the amount — pick or type the item yourself"
   },
   "items": {
     "title": "Spending Items",

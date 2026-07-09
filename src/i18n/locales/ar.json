@@ -75,7 +75,12 @@
     "notePlaceholder": "أضف ملاحظة…",
     "save": "حفظ المصروف",
     "itemRequired": "اختر أو أنشئ صنفاً",
-    "amountRequired": "أدخل مبلغاً"
+    "amountRequired": "أدخل مبلغاً",
+    "pasteBankMessage": "لصق رسالة من البنك",
+    "pasteBankMessagePlaceholder": "الصق نص إشعار البنك هنا…",
+    "parseMessage": "تحليل الرسالة",
+    "parseNoAmount": "ما قدرت ألقى مبلغاً في هذه الرسالة",
+    "parseNoMerchant": "حصلت على المبلغ — اختر أو اكتب الصنف بنفسك"
   },
   "items": {
     "title": "الأصناف",

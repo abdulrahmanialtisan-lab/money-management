@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { ClipboardPaste } from 'lucide-react'
 import { Sheet } from '../../components/ui/Sheet'
 import { AmountInput } from '../../components/ui/AmountInput'
 import { Pill } from '../../components/ui/Pill'
@@ -9,6 +10,7 @@ import { useUiStore } from '../../state/uiStore'
 import { useSettingsState, useSpendingItems } from '../../state/settingsQueries'
 import { addTransaction } from '../../db/transactions'
 import { COLOR_SWATCHES, DEFAULT_ICON, ICONS } from '../../icons/categoryIcons'
+import { parseBankMessage } from '../../domain/parseBankMessage'
 import { today } from '../../utils/date'
 import type { Importance } from '../../domain/types'
 
@@ -38,6 +40,8 @@ export function AddExpenseSheet() {
   const [newItemName, setNewItemName] = useState('')
   const [newItemImportance, setNewItemImportance] = useState<Importance>('important')
   const [saving, setSaving] = useState(false)
+  const [pasteOpen, setPasteOpen] = useState(false)
+  const [pasteText, setPasteText] = useState('')
 
   const currency = settingsState !== 'loading' && settingsState !== 'not-found' ? settingsState.currency : ''
 
@@ -64,6 +68,8 @@ export function AddExpenseSheet() {
     setNote('')
     setNewItemName('')
     setNewItemImportance('important')
+    setPasteOpen(false)
+    setPasteText('')
   }
 
   function handleClose() {
@@ -78,6 +84,24 @@ export function AddExpenseSheet() {
 
   function confirmNewItem() {
     setStep('pick')
+  }
+
+  function handleParseMessage() {
+    const result = parseBankMessage(pasteText)
+    if (result.amount === null) {
+      showToast(t('expense.parseNoAmount'))
+      return
+    }
+    setAmount(String(result.amount))
+    setSelectedItemId(undefined)
+    if (result.merchant) {
+      setNewItemName(result.merchant)
+      setStep('newItem')
+    } else {
+      showToast(t('expense.parseNoMerchant'))
+    }
+    setPasteOpen(false)
+    setPasteText('')
   }
 
   useEffect(() => {
@@ -118,6 +142,43 @@ export function AddExpenseSheet() {
   return (
     <Sheet open={open} onClose={handleClose} title={t('expense.addExpense')}>
       <div className="space-y-5">
+        {!pasteOpen ? (
+          <button
+            type="button"
+            onClick={() => setPasteOpen(true)}
+            className="flex items-center gap-2 text-xs font-medium text-accent-strong"
+          >
+            <ClipboardPaste size={14} />
+            {t('expense.pasteBankMessage')}
+          </button>
+        ) : (
+          <div className="space-y-2 rounded-2xl border border-border p-3">
+            <textarea
+              value={pasteText}
+              onChange={(e) => setPasteText(e.target.value)}
+              placeholder={t('expense.pasteBankMessagePlaceholder')}
+              rows={3}
+              autoFocus
+              className="w-full resize-none rounded-xl bg-surface-2 p-3 text-sm outline-none placeholder:text-muted"
+            />
+            <div className="flex gap-2">
+              <Pill
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setPasteOpen(false)
+                  setPasteText('')
+                }}
+              >
+                {t('common.cancel')}
+              </Pill>
+              <Pill variant="dark" size="sm" className="flex-1" onClick={handleParseMessage} disabled={!pasteText.trim()}>
+                {t('expense.parseMessage')}
+              </Pill>
+            </div>
+          </div>
+        )}
+
         <AmountInput value={amount} onChange={setAmount} currency={currency} autoFocus />
 
         {step === 'pick' && (
