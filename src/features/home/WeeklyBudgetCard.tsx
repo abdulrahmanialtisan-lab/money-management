@@ -12,19 +12,26 @@ interface WeeklyBudgetCardProps {
   language: 'en' | 'ar'
 }
 
+function amountFontSizeClass(text: string): string {
+  if (text.length <= 10) return 'text-3xl'
+  if (text.length <= 13) return 'text-2xl'
+  return 'text-xl'
+}
+
 export function WeeklyBudgetCard({ weekSpent, weekBudget, plannedBudget, daysLeft, currency, language }: WeeklyBudgetCardProps) {
   const { t } = useTranslation()
   const pct = weekBudget > 0 ? (weekSpent / weekBudget) * 100 : 0
   const over = weekSpent > weekBudget
   const rollover = Math.round((weekBudget - plannedBudget) * 100) / 100
+  const spentText = formatAmount(weekSpent, currency, language)
 
   return (
     <Card variant="surface" className="flex flex-col items-center text-center">
       <p className="self-start text-sm font-medium text-ink-soft">{t('home.weeklyBudget')}</p>
 
-      <ArcGauge value={Math.min(pct, 100)} size={200} strokeWidth={16} tone={over ? 'danger' : 'accent'}>
+      <ArcGauge value={Math.min(pct, 100)} size={220} strokeWidth={16} tone={over ? 'danger' : 'accent'}>
         <span className="text-xs text-muted">{t('home.totalExpensedThisWeek')}</span>
-        <span className="mt-1 text-3xl font-bold tabular-nums">{formatAmount(weekSpent, currency, language)}</span>
+        <span className={`mt-1 whitespace-nowrap font-bold tabular-nums ${amountFontSizeClass(spentText)}`}>{spentText}</span>
         <span className="mt-1 text-xs text-muted">
           {t('common.of')} {formatAmount(weekBudget, currency, language)}
         </span>
