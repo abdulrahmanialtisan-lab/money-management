@@ -162,6 +162,7 @@
     "salaryReceived": "بدأت فترة راتب جديدة",
     "salaryAddedToBank": "تمت إضافة الراتب لرصيد البنك",
     "expenseDeleted": "تم حذف المصروف",
+    "expenseUpdated": "تم تحديث المصروف",
     "exported": "تم تنزيل النسخة الاحتياطية",
     "imported": "تم استيراد البيانات",
     "importFailed": "فشل الاستيراد — تحقق من الملف",
