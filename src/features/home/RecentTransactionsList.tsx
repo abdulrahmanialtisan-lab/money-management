@@ -44,6 +44,7 @@ export function RecentTransactionsList({ transactions, itemsById, currency, lang
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-medium">{tx.itemNameSnapshot}</p>
               <p className="text-xs text-muted">{dateLabel}</p>
+              {tx.note && <p className="truncate text-xs italic text-muted">{tx.note}</p>}
             </div>
             <p className="shrink-0 text-sm font-semibold tabular-nums">{formatAmount(tx.amount, currency, language)}</p>
           </button>

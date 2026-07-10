@@ -88,3 +88,12 @@ select,
 textarea {
   font-size: 16px !important;
 }
+
+/* iOS Safari renders its own opaque chrome inside <input type="date">
+   that ignores our border-radius/background, producing a mismatched
+   square corner next to neighboring fields — disable native appearance
+   so our own styling renders cleanly. */
+input[type="date"] {
+  -webkit-appearance: none;
+  appearance: none;
+}
