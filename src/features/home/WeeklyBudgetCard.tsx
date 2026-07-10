@@ -24,6 +24,7 @@ export function WeeklyBudgetCard({ weekSpent, weekBudget, plannedBudget, daysLef
   const over = weekSpent > weekBudget
   const rollover = Math.round((weekBudget - plannedBudget) * 100) / 100
   const spentText = formatAmount(weekSpent, currency, language)
+  const remaining = weekBudget - weekSpent
 
   return (
     <Card variant="surface" className="flex flex-col items-center text-center">
@@ -36,6 +37,12 @@ export function WeeklyBudgetCard({ weekSpent, weekBudget, plannedBudget, daysLef
           {t('common.of')} {formatAmount(weekBudget, currency, language)}
         </span>
       </ArcGauge>
+
+      {!over && (
+        <p className="text-base font-semibold text-accent-strong">
+          {t('home.remainingThisWeek', { amount: formatAmount(remaining, currency, language) })}
+        </p>
+      )}
 
       <p className={`-mt-2 text-xs font-medium ${over ? 'text-danger-strong' : 'text-muted'}`}>
         {over ? t('home.overspentWeek') : t('home.daysLeftInWeek', { count: daysLeft })}
