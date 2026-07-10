@@ -39,12 +39,12 @@ export function WeeklyBudgetCard({ weekSpent, weekBudget, plannedBudget, daysLef
       </ArcGauge>
 
       {!over && (
-        <p className="text-base font-semibold text-accent-strong">
+        <p className="-mt-2 text-sm font-semibold text-accent-strong">
           {t('home.remainingThisWeek', { amount: formatAmount(remaining, currency, language) })}
         </p>
       )}
 
-      <p className={`-mt-2 text-xs font-medium ${over ? 'text-danger-strong' : 'text-muted'}`}>
+      <p className={`text-xs font-medium ${over ? '-mt-2 text-danger-strong' : 'mt-0.5 text-muted'}`}>
         {over ? t('home.overspentWeek') : t('home.daysLeftInWeek', { count: daysLeft })}
       </p>
       {rollover !== 0 && (
