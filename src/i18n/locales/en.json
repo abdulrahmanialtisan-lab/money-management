@@ -162,6 +162,7 @@
     "salaryReceived": "New pay period started",
     "salaryAddedToBank": "Salary added to bank balance",
     "expenseDeleted": "Expense deleted",
+    "expenseUpdated": "Expense updated",
     "exported": "Backup downloaded",
     "imported": "Data imported",
     "importFailed": "Import failed — check the file",
