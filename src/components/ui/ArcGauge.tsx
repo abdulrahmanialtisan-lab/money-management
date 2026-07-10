@@ -52,7 +52,7 @@ export function ArcGauge({ value, size = 220, strokeWidth = 18, tone = 'accent',
           style={{ transition: 'stroke-dashoffset 0.6s ease-out' }}
         />
       </svg>
-      <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center">{children}</div>
+      <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center">{children}</div>
     </div>
   )
 }
