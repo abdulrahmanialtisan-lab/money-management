@@ -3,6 +3,7 @@ import type { Transaction } from '../../domain/types'
 import { DEFAULT_ICON, ICONS } from '../../icons/categoryIcons'
 import { formatAmount } from '../../utils/currency'
 import { addDays, today } from '../../utils/date'
+import { useUiStore } from '../../state/uiStore'
 
 interface RecentTransactionsListProps {
   transactions: Transaction[]
@@ -13,6 +14,7 @@ interface RecentTransactionsListProps {
 
 export function RecentTransactionsList({ transactions, itemsById, currency, language }: RecentTransactionsListProps) {
   const { t } = useTranslation()
+  const openTransactionDetail = useUiStore((s) => s.openTransactionDetail)
 
   if (transactions.length === 0) {
     return <p className="rounded-2xl bg-surface-2 px-4 py-6 text-center text-sm text-muted">{t('home.noTransactionsYet')}</p>
@@ -30,7 +32,12 @@ export function RecentTransactionsList({ transactions, itemsById, currency, lang
         const dateLabel = tx.date === todayKey ? t('common.today') : tx.date === yesterdayKey ? t('common.yesterday') : tx.date
 
         return (
-          <div key={tx.id} className="flex items-center gap-3 rounded-2xl bg-surface px-3 py-3">
+          <button
+            type="button"
+            key={tx.id}
+            onClick={() => openTransactionDetail(tx.id)}
+            className="flex w-full items-center gap-3 rounded-2xl bg-surface px-3 py-3 text-start"
+          >
             <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl" style={{ backgroundColor: `${color}22` }}>
               <Icon size={18} color={color} />
             </span>
@@ -39,7 +46,7 @@ export function RecentTransactionsList({ transactions, itemsById, currency, lang
               <p className="text-xs text-muted">{dateLabel}</p>
             </div>
             <p className="shrink-0 text-sm font-semibold tabular-nums">{formatAmount(tx.amount, currency, language)}</p>
-          </div>
+          </button>
         )
       })}
     </div>

@@ -1,16 +1,19 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Wallet } from 'lucide-react'
+import { Plus, Wallet } from 'lucide-react'
 import { updateSettings } from '../../db/db'
+import { AddSalaryToBankSheet } from './AddSalaryToBankSheet'
 
 interface BankBalanceCardProps {
   bankBalance: number
   currency: string
+  defaultSalaryAmount: number
 }
 
-export function BankBalanceCard({ bankBalance, currency }: BankBalanceCardProps) {
+export function BankBalanceCard({ bankBalance, currency, defaultSalaryAmount }: BankBalanceCardProps) {
   const { t } = useTranslation()
   const [draft, setDraft] = useState<string | null>(null)
+  const [addSalaryOpen, setAddSalaryOpen] = useState(false)
 
   async function handleBlur() {
     if (draft === null) return
@@ -44,6 +47,21 @@ export function BankBalanceCard({ bankBalance, currency }: BankBalanceCardProps)
           <span className="shrink-0 text-xs font-medium text-muted">{currency}</span>
         </div>
       </div>
+      <button
+        type="button"
+        onClick={() => setAddSalaryOpen(true)}
+        aria-label={t('home.addSalaryToBank')}
+        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent text-[#0b0f0d]"
+      >
+        <Plus size={18} />
+      </button>
+
+      <AddSalaryToBankSheet
+        open={addSalaryOpen}
+        onClose={() => setAddSalaryOpen(false)}
+        currency={currency}
+        defaultAmount={defaultSalaryAmount}
+      />
     </div>
   )
 }

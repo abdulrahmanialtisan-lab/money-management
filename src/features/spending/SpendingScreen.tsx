@@ -16,6 +16,7 @@ import { DailySpendingChart } from './DailySpendingChart'
 import { DEFAULT_ICON, ICONS } from '../../icons/categoryIcons'
 import { formatAmount } from '../../utils/currency'
 import { addDays, compareDateKeys, dateLocale, fromDateKey, today } from '../../utils/date'
+import { useUiStore } from '../../state/uiStore'
 
 interface FlatWeek {
   periodId: string
@@ -39,6 +40,7 @@ function flattenWeeks(periods: PayPeriod[]): FlatWeek[] {
 export function SpendingScreen() {
   const { t } = useTranslation()
   const settingsState = useSettingsState()
+  const openTransactionDetail = useUiStore((s) => s.openTransactionDetail)
   const allPeriods = useAllPeriods()
   const activePeriod = useActivePeriod()
   const activePeriodTransactions = useTransactionsForPeriod(activePeriod?.id)
@@ -196,13 +198,18 @@ export function SpendingScreen() {
               const item = tx.spendingItemId ? itemsById.get(tx.spendingItemId) : undefined
               const Icon = ICONS[item?.icon ?? DEFAULT_ICON]
               return (
-                <div key={tx.id} className="flex items-center gap-3 rounded-2xl bg-surface px-3 py-3">
+                <button
+                  type="button"
+                  key={tx.id}
+                  onClick={() => openTransactionDetail(tx.id)}
+                  className="flex w-full items-center gap-3 rounded-2xl bg-surface px-3 py-3 text-start"
+                >
                   <span className="flex h-10 w-10 items-center justify-center rounded-xl" style={{ backgroundColor: `${item?.color ?? '#8a8a86'}22` }}>
                     <Icon size={16} color={item?.color ?? '#8a8a86'} />
                   </span>
                   <span className="flex-1 truncate text-sm font-medium">{tx.itemNameSnapshot}</span>
                   <span className="text-sm font-semibold tabular-nums">{formatAmount(tx.amount, currency, locale)}</span>
-                </div>
+                </button>
               )
             })}
           </div>

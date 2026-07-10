@@ -50,6 +50,20 @@ export function useTransactionsForDate(dateKey: string): Transaction[] | undefin
   return useLiveQuery(() => db.transactions.where('date').equals(dateKey).toArray(), [dateKey])
 }
 
+export function useTransaction(id: string | null): Transaction | undefined | null {
+  return useLiveQuery(async () => {
+    if (!id) return null
+    return (await db.transactions.get(id)) ?? null
+  }, [id])
+}
+
+export function useSpendingItem(id: string | undefined): SpendingItem | undefined | null {
+  return useLiveQuery(async () => {
+    if (!id) return null
+    return (await db.spendingItems.get(id)) ?? null
+  }, [id])
+}
+
 export function useRecentTransactions(limit = 8): Transaction[] | undefined {
   return useLiveQuery(async () => {
     const rows = await db.transactions.orderBy('date').reverse().limit(limit * 3).toArray()

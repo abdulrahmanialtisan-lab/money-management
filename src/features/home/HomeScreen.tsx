@@ -74,7 +74,11 @@ export function HomeScreen() {
         periodLabel={periodLabel}
       />
 
-      <BankBalanceCard bankBalance={settingsState.bankBalance ?? 0} currency={currency} />
+      <BankBalanceCard
+        bankBalance={settingsState.bankBalance ?? 0}
+        currency={currency}
+        defaultSalaryAmount={activePeriod.salaryAmount ?? settingsState.defaultSalaryAmount}
+      />
 
       <WeeklyBudgetCard
         weekSpent={weekSpent}

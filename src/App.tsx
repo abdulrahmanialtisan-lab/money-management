@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { Route, Routes } from 'react-router-dom'
 import { BottomNav } from './components/nav/BottomNav'
 import { AddExpenseSheet } from './features/expense/AddExpenseSheet'
+import { TransactionDetailSheet } from './features/expense/TransactionDetailSheet'
 import { HomeScreen } from './features/home/HomeScreen'
 import { CalendarScreen } from './features/calendar/CalendarScreen'
 import { ItemsScreen } from './features/items/ItemsScreen'
@@ -71,6 +72,7 @@ export default function App() {
       </Routes>
       <BottomNav />
       <AddExpenseSheet />
+      <TransactionDetailSheet />
       <Toast />
     </div>
   )

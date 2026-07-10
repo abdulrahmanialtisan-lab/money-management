@@ -8,10 +8,12 @@ import { dateLocale, toDateKey, today } from '../../utils/date'
 import { cn } from '../../utils/cn'
 import { computeVerdict } from '../../domain/verdict'
 import type { Transaction } from '../../domain/types'
+import { useUiStore } from '../../state/uiStore'
 
 export function CalendarScreen() {
   const { t } = useTranslation()
   const settingsState = useSettingsState()
+  const openTransactionDetail = useUiStore((s) => s.openTransactionDetail)
   const items = useSpendingItems()
   const [viewedMonth, setViewedMonth] = useState(() => {
     const d = new Date()
@@ -144,13 +146,18 @@ export function CalendarScreen() {
               const item = tx.spendingItemId ? itemsById.get(tx.spendingItemId) : undefined
               const Icon = ICONS[item?.icon ?? DEFAULT_ICON]
               return (
-                <div key={tx.id} className="flex items-center gap-3 rounded-2xl bg-surface px-3 py-3">
+                <button
+                  type="button"
+                  key={tx.id}
+                  onClick={() => openTransactionDetail(tx.id)}
+                  className="flex w-full items-center gap-3 rounded-2xl bg-surface px-3 py-3 text-start"
+                >
                   <span className="flex h-10 w-10 items-center justify-center rounded-xl" style={{ backgroundColor: `${item?.color ?? '#8a8a86'}22` }}>
                     <Icon size={16} color={item?.color ?? '#8a8a86'} />
                   </span>
                   <span className="flex-1 truncate text-sm font-medium">{tx.itemNameSnapshot}</span>
                   <span className="text-sm font-semibold tabular-nums">{formatAmount(tx.amount, currency, language)}</span>
-                </div>
+                </button>
               )
             })}
             <div className="flex items-center justify-between rounded-2xl bg-ink px-4 py-3 text-bg">

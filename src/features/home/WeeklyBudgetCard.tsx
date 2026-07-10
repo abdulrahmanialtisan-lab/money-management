@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { Card } from '../../components/ui/Card'
-import { DonutRing } from '../../components/ui/DonutRing'
+import { ArcGauge } from '../../components/ui/ArcGauge'
 import { formatAmount } from '../../utils/currency'
 
 interface WeeklyBudgetCardProps {
@@ -19,27 +19,27 @@ export function WeeklyBudgetCard({ weekSpent, weekBudget, plannedBudget, daysLef
   const rollover = Math.round((weekBudget - plannedBudget) * 100) / 100
 
   return (
-    <Card variant="surface" className="flex items-center gap-4">
-      <DonutRing value={Math.min(pct, 100)} size={96} strokeWidth={10} tone={over ? 'danger' : 'accent'}>
-        <span className="text-sm font-bold tabular-nums">{Math.round(pct)}%</span>
-      </DonutRing>
-      <div className="flex-1">
-        <p className="text-sm font-medium text-ink-soft">{t('home.weeklyBudget')}</p>
-        <p className="mt-1 text-xl font-bold tabular-nums">{formatAmount(weekBudget - weekSpent, currency, language)}</p>
-        <p className="text-xs text-muted">
-          {formatAmount(weekSpent, currency, language)} {t('common.of')} {formatAmount(weekBudget, currency, language)}
+    <Card variant="surface" className="flex flex-col items-center text-center">
+      <p className="self-start text-sm font-medium text-ink-soft">{t('home.weeklyBudget')}</p>
+
+      <ArcGauge value={Math.min(pct, 100)} size={200} strokeWidth={16} tone={over ? 'danger' : 'accent'}>
+        <span className="text-xs text-muted">{t('home.totalExpensedThisWeek')}</span>
+        <span className="mt-1 text-3xl font-bold tabular-nums">{formatAmount(weekSpent, currency, language)}</span>
+        <span className="mt-1 text-xs text-muted">
+          {t('common.of')} {formatAmount(weekBudget, currency, language)}
+        </span>
+      </ArcGauge>
+
+      <p className={`-mt-2 text-xs font-medium ${over ? 'text-danger-strong' : 'text-muted'}`}>
+        {over ? t('home.overspentWeek') : t('home.daysLeftInWeek', { count: daysLeft })}
+      </p>
+      {rollover !== 0 && (
+        <p className={`mt-0.5 text-xs font-medium ${rollover > 0 ? 'text-accent-strong' : 'text-danger-strong'}`}>
+          {rollover > 0
+            ? t('home.rolloverSurplus', { amount: formatAmount(rollover, currency, language) })
+            : t('home.rolloverDeficit', { amount: formatAmount(Math.abs(rollover), currency, language) })}
         </p>
-        <p className={`mt-1 text-xs font-medium ${over ? 'text-danger-strong' : 'text-muted'}`}>
-          {over ? t('home.overspentWeek') : t('home.daysLeftInWeek', { count: daysLeft })}
-        </p>
-        {rollover !== 0 && (
-          <p className={`mt-0.5 text-xs font-medium ${rollover > 0 ? 'text-accent-strong' : 'text-danger-strong'}`}>
-            {rollover > 0
-              ? t('home.rolloverSurplus', { amount: formatAmount(rollover, currency, language) })
-              : t('home.rolloverDeficit', { amount: formatAmount(Math.abs(rollover), currency, language) })}
-          </p>
-        )}
-      </div>
+      )}
     </Card>
   )
 }

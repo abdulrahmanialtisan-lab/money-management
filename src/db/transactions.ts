@@ -1,6 +1,7 @@
 import type { Importance, ImportanceOrUnclassified } from '../domain/types'
 import { today } from '../utils/date'
 import { makeId } from '../utils/id'
+import { adjustBankBalance } from './bankBalance'
 import { db } from './db'
 
 export interface AddTransactionInput {
@@ -77,10 +78,15 @@ export async function addTransaction(input: AddTransactionInput): Promise<void> 
     createdAt: now,
     updatedAt: now,
   })
+
+  await adjustBankBalance(-input.amount)
 }
 
 export async function deleteTransaction(id: string): Promise<void> {
+  const existing = await db.transactions.get(id)
+  if (!existing) return
   await db.transactions.delete(id)
+  await adjustBankBalance(existing.amount)
 }
 
 export async function updateTransaction(
