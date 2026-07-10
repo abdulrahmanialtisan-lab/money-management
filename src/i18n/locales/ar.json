@@ -54,6 +54,7 @@
     "totalExpensed": "إجمالي المصروف",
     "weeklyBudget": "الميزانية الأسبوعية",
     "totalExpensedThisWeek": "مصروف هذا الأسبوع",
+    "remainingThisWeek": "متبقٍ {{amount}} تقدر تصرفه",
     "thisWeek": "هذا الأسبوع",
     "commitmentsQuick": "الفواتير والالتزامات",
     "quickAdd": "إضافة سريعة",

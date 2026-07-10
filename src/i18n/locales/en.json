@@ -54,6 +54,7 @@
     "totalExpensed": "Total Expensed",
     "weeklyBudget": "Weekly budget",
     "totalExpensedThisWeek": "Spent this week",
+    "remainingThisWeek": "{{amount}} left to spend",
     "thisWeek": "This week",
     "commitmentsQuick": "Bills & Utilities",
     "quickAdd": "Quick add",
