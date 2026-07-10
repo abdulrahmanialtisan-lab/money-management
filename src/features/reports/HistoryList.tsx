@@ -5,6 +5,7 @@ import { Pill } from '../../components/ui/Pill'
 import type { Transaction } from '../../domain/types'
 import { DEFAULT_ICON, ICONS } from '../../icons/categoryIcons'
 import { formatAmount } from '../../utils/currency'
+import { useUiStore } from '../../state/uiStore'
 
 interface HistoryListProps {
   transactions: Transaction[]
@@ -17,6 +18,7 @@ type Filter = 'all' | 'important' | 'not_important'
 
 export function HistoryList({ transactions, itemsById, currency, language }: HistoryListProps) {
   const { t } = useTranslation()
+  const openTransactionDetail = useUiStore((s) => s.openTransactionDetail)
   const [query, setQuery] = useState('')
   const [filter, setFilter] = useState<Filter>('all')
 
@@ -60,7 +62,12 @@ export function HistoryList({ transactions, itemsById, currency, language }: His
             const Icon = ICONS[meta?.icon ?? DEFAULT_ICON]
             const color = meta?.color ?? '#8a8a86'
             return (
-              <div key={tx.id} className="flex items-center gap-3 rounded-2xl bg-surface px-3 py-3">
+              <button
+                type="button"
+                key={tx.id}
+                onClick={() => openTransactionDetail(tx.id)}
+                className="flex w-full items-center gap-3 rounded-2xl bg-surface px-3 py-3 text-start"
+              >
                 <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl" style={{ backgroundColor: `${color}22` }}>
                   <Icon size={16} color={color} />
                 </span>
@@ -69,7 +76,7 @@ export function HistoryList({ transactions, itemsById, currency, language }: His
                   <p className="text-xs text-muted">{tx.date}</p>
                 </div>
                 <p className="shrink-0 text-sm font-semibold tabular-nums">{formatAmount(tx.amount, currency, language)}</p>
-              </div>
+              </button>
             )
           })}
         </div>
