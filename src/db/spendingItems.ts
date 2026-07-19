@@ -8,6 +8,7 @@ export interface UpsertSpendingItemInput {
   importance: Importance
   icon: string
   color: string
+  categoryId?: string
 }
 
 export async function upsertSpendingItem(input: UpsertSpendingItemInput): Promise<string> {
@@ -18,6 +19,7 @@ export async function upsertSpendingItem(input: UpsertSpendingItemInput): Promis
       importance: input.importance,
       icon: input.icon,
       color: input.color,
+      categoryId: input.categoryId,
       updatedAt: now,
     })
     return input.id
@@ -29,6 +31,7 @@ export async function upsertSpendingItem(input: UpsertSpendingItemInput): Promis
     importance: input.importance,
     icon: input.icon,
     color: input.color,
+    categoryId: input.categoryId,
     usageCount: 0,
     archived: false,
     createdAt: now,

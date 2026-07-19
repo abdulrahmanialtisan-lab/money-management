@@ -16,7 +16,11 @@ import { applyLanguage } from './i18n'
 import { rollPeriodsIfNeeded } from './db/periodService'
 import { useSettingsState } from './state/settingsQueries'
 import { db } from './db/db'
-import { checkUpcomingCommitments } from './lib/notifications'
+import { checkUpcomingCommitments, checkUpcomingDebts } from './lib/notifications'
+import { seedDefaultCategoriesIfNeeded } from './db/categories'
+import { GoalsScreen } from './features/goals/GoalsScreen'
+import { DebtsScreen } from './features/debts/DebtsScreen'
+import { CategoriesScreen } from './features/categories/CategoriesScreen'
 
 function applyTheme(theme: 'light' | 'dark' | 'system') {
   const root = document.documentElement
@@ -47,8 +51,14 @@ export default function App() {
   }, [settings, onboarded])
 
   useEffect(() => {
+    if (!settings) return
+    seedDefaultCategoriesIfNeeded(settings.language)
+  }, [settings])
+
+  useEffect(() => {
     if (!settings || !onboarded || !settings.notificationsEnabled) return
     db.commitments.toArray().then(checkUpcomingCommitments)
+    db.debts.where('status').equals('active').toArray().then(checkUpcomingDebts)
   }, [settings, onboarded])
 
   if (loading) {
@@ -69,6 +79,9 @@ export default function App() {
         <Route path="/settings" element={<SettingsScreen />} />
         <Route path="/commitments" element={<CommitmentsScreen />} />
         <Route path="/spending" element={<SpendingScreen />} />
+        <Route path="/goals" element={<GoalsScreen />} />
+        <Route path="/debts" element={<DebtsScreen />} />
+        <Route path="/categories" element={<CategoriesScreen />} />
       </Routes>
       <BottomNav />
       <AddExpenseSheet />

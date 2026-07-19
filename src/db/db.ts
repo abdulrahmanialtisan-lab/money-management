@@ -1,5 +1,16 @@
 import Dexie, { type EntityTable } from 'dexie'
-import type { Commitment, PayPeriod, Settings, SpendingItem, Transaction } from '../domain/types'
+import type {
+  Category,
+  Commitment,
+  Debt,
+  DebtPayment,
+  Goal,
+  GoalContribution,
+  PayPeriod,
+  Settings,
+  SpendingItem,
+  Transaction,
+} from '../domain/types'
 import { dbNameForProfile, getActiveProfile } from './profiles'
 
 export class AppDatabase extends Dexie {
@@ -8,6 +19,11 @@ export class AppDatabase extends Dexie {
   spendingItems!: EntityTable<SpendingItem, 'id'>
   transactions!: EntityTable<Transaction, 'id'>
   payPeriods!: EntityTable<PayPeriod, 'id'>
+  categories!: EntityTable<Category, 'id'>
+  goals!: EntityTable<Goal, 'id'>
+  goalContributions!: EntityTable<GoalContribution, 'id'>
+  debts!: EntityTable<Debt, 'id'>
+  debtPayments!: EntityTable<DebtPayment, 'id'>
 
   constructor(name: string) {
     super(name)
@@ -18,12 +34,24 @@ export class AppDatabase extends Dexie {
       transactions: 'id, date, periodId, spendingItemId',
       payPeriods: 'id, status, startDate',
     })
+    this.version(2).stores({
+      settings: 'id',
+      commitments: 'id, active',
+      spendingItems: 'id, importance, archived, name, categoryId',
+      transactions: 'id, date, periodId, spendingItemId, categoryIdSnapshot',
+      payPeriods: 'id, status, startDate',
+      categories: 'id, archived, name',
+      goals: 'id, status',
+      goalContributions: 'id, goalId, date',
+      debts: 'id, status, type, dueDate',
+      debtPayments: 'id, debtId, date',
+    })
   }
 }
 
 export const db = new AppDatabase(dbNameForProfile(getActiveProfile()))
 
-export const SCHEMA_VERSION = 1
+export const SCHEMA_VERSION = 2
 
 export const DEFAULT_SETTINGS: Settings = {
   id: 'singleton',

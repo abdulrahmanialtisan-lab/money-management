@@ -2,9 +2,11 @@ import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { computeVerdict, comparePeriods } from '../../domain/verdict'
 import { computeRolledOverBudgets } from '../../domain/weeklyBudget'
-import { useAllPeriods, useSettingsState, useSpendingItems, useTransactionsForPeriod } from '../../state/settingsQueries'
+import { useAllPeriods, useCategories, useSettingsState, useSpendingItems, useTransactionsForPeriod } from '../../state/settingsQueries'
 import { VerdictCard } from './VerdictCard'
 import { CategoryBreakdown } from './CategoryBreakdown'
+import { CategoryPieChart } from './CategoryPieChart'
+import { InsightsCard } from './InsightsCard'
 import { WeeklyActualsChart } from './WeeklyActualsChart'
 import { HistoryList } from './HistoryList'
 import { Select } from '../../components/ui/Select'
@@ -15,6 +17,7 @@ export function ReportsScreen() {
   const settingsState = useSettingsState()
   const allPeriods = useAllPeriods()
   const items = useSpendingItems(true)
+  const categories = useCategories()
 
   const [selectedPeriodId, setSelectedPeriodId] = useState<string | undefined>()
   const activePeriodFallback = (allPeriods ?? [])[0]
@@ -67,6 +70,16 @@ export function ReportsScreen() {
 
       <VerdictCard verdict={verdict} delta={delta} currency={currency} language={language as 'en' | 'ar'} />
 
+      <InsightsCard
+        period={period}
+        transactions={transactions ?? []}
+        previousTransactions={previousTransactions ?? []}
+        categories={categories ?? []}
+        itemsById={itemsById}
+        currency={currency}
+        language={language as 'en' | 'ar'}
+      />
+
       <div>
         <p className="mb-2 text-sm font-medium text-ink-soft">{t('reports.weeklyActuals')}</p>
         <WeeklyActualsChart weeks={weeksWithRollover} actuals={weeklyActuals} currency={currency} language={language as 'en' | 'ar'} />
@@ -74,6 +87,11 @@ export function ReportsScreen() {
 
       <div>
         <p className="mb-2 text-sm font-medium text-ink-soft">{t('reports.categoryBreakdown')}</p>
+        <CategoryPieChart transactions={transactions ?? []} categories={categories ?? []} itemsById={itemsById} currency={currency} language={language as 'en' | 'ar'} />
+      </div>
+
+      <div>
+        <p className="mb-2 text-sm font-medium text-ink-soft">{t('reports.topItems')}</p>
         <CategoryBreakdown transactions={transactions ?? []} itemsById={itemsById} currency={currency} language={language as 'en' | 'ar'} />
       </div>
 

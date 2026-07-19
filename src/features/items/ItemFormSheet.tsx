@@ -7,6 +7,7 @@ import { IconPicker } from '../../components/ui/IconPicker'
 import { ColorSwatchPicker } from '../../components/ui/ColorSwatchPicker'
 import { upsertSpendingItem, archiveSpendingItem, deleteSpendingItem } from '../../db/spendingItems'
 import { useUiStore } from '../../state/uiStore'
+import { useCategories } from '../../state/settingsQueries'
 import { DEFAULT_COLOR, DEFAULT_ICON } from '../../icons/categoryIcons'
 import type { Importance, SpendingItem } from '../../domain/types'
 
@@ -19,11 +20,13 @@ interface ItemFormSheetProps {
 export function ItemFormSheet({ open, onClose, editingItem }: ItemFormSheetProps) {
   const { t } = useTranslation()
   const showToast = useUiStore((s) => s.showToast)
+  const categories = useCategories()
 
   const [name, setName] = useState('')
   const [importance, setImportance] = useState<Importance>('important')
   const [icon, setIcon] = useState(DEFAULT_ICON)
   const [color, setColor] = useState(DEFAULT_COLOR)
+  const [categoryId, setCategoryId] = useState<string | undefined>(undefined)
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
@@ -32,13 +35,14 @@ export function ItemFormSheet({ open, onClose, editingItem }: ItemFormSheetProps
     setImportance(editingItem?.importance ?? 'important')
     setIcon(editingItem?.icon ?? DEFAULT_ICON)
     setColor(editingItem?.color ?? DEFAULT_COLOR)
+    setCategoryId(editingItem?.categoryId)
   }, [open, editingItem])
 
   async function handleSave() {
     if (!name.trim()) return
     setSaving(true)
     try {
-      await upsertSpendingItem({ id: editingItem?.id, name: name.trim(), importance, icon, color })
+      await upsertSpendingItem({ id: editingItem?.id, name: name.trim(), importance, icon, color, categoryId })
       showToast(t('toast.itemSaved'))
       onClose()
     } finally {
@@ -75,6 +79,27 @@ export function ItemFormSheet({ open, onClose, editingItem }: ItemFormSheetProps
             </Pill>
           </div>
         </div>
+
+        {(categories ?? []).length > 0 && (
+          <div>
+            <span className="mb-1.5 block text-sm font-medium text-ink-soft">{t('categories.title')}</span>
+            <div className="flex flex-wrap gap-2">
+              <Pill size="sm" variant={!categoryId ? 'dark' : 'outline'} onClick={() => setCategoryId(undefined)}>
+                {t('categories.none')}
+              </Pill>
+              {(categories ?? []).map((category) => (
+                <Pill
+                  key={category.id}
+                  size="sm"
+                  variant={categoryId === category.id ? 'dark' : 'outline'}
+                  onClick={() => setCategoryId(category.id)}
+                >
+                  {category.name}
+                </Pill>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div>
           <span className="mb-1.5 block text-sm font-medium text-ink-soft">{t('items.icon')}</span>
