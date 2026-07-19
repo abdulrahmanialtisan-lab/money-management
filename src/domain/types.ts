@@ -27,12 +27,23 @@ export interface Commitment {
   updatedAt: string
 }
 
+export interface Category {
+  id: string
+  name: string
+  icon: string
+  color: string
+  archived: boolean
+  createdAt: string
+  updatedAt: string
+}
+
 export interface SpendingItem {
   id: string
   name: string
   importance: Importance
   icon: string
   color: string
+  categoryId?: string
   usageCount: number
   lastUsedAt?: string
   archived: boolean
@@ -47,10 +58,61 @@ export interface Transaction {
   spendingItemId?: string
   itemNameSnapshot: string
   importanceSnapshot: ImportanceOrUnclassified
+  categoryIdSnapshot?: string
   note?: string
   periodId: string
   createdAt: string
   updatedAt: string
+}
+
+export type GoalStatus = 'active' | 'achieved' | 'archived'
+
+export interface Goal {
+  id: string
+  name: string
+  targetAmount: number
+  currentAmount: number
+  icon: string
+  color: string
+  targetDate?: string
+  status: GoalStatus
+  createdAt: string
+  updatedAt: string
+}
+
+export interface GoalContribution {
+  id: string
+  goalId: string
+  amount: number
+  date: string
+  note?: string
+  createdAt: string
+}
+
+export type DebtType = 'owed_to_me' | 'owed_by_me'
+export type DebtStatus = 'active' | 'settled'
+
+export interface Debt {
+  id: string
+  name: string
+  type: DebtType
+  counterpartyName?: string
+  principalAmount: number
+  remainingAmount: number
+  dueDate?: string
+  notes?: string
+  status: DebtStatus
+  createdAt: string
+  updatedAt: string
+}
+
+export interface DebtPayment {
+  id: string
+  debtId: string
+  amount: number
+  date: string
+  note?: string
+  createdAt: string
 }
 
 export interface CommitmentSnapshot {

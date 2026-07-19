@@ -1,5 +1,5 @@
 import { useLiveQuery } from 'dexie-react-hooks'
-import type { Commitment, PayPeriod, Settings, SpendingItem, Transaction } from '../domain/types'
+import type { Category, Commitment, Debt, DebtPayment, Goal, GoalContribution, PayPeriod, Settings, SpendingItem, Transaction } from '../domain/types'
 import { db } from '../db/db'
 
 export type SettingsState = Settings | 'not-found' | 'loading'
@@ -69,4 +69,42 @@ export function useRecentTransactions(limit = 8): Transaction[] | undefined {
     const rows = await db.transactions.orderBy('date').reverse().limit(limit * 3).toArray()
     return rows.sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1)).slice(0, limit)
   }, [limit])
+}
+
+export function useCategories(includeArchived = false): Category[] | undefined {
+  return useLiveQuery(async () => {
+    const all = await db.categories.toArray()
+    const filtered = includeArchived ? all : all.filter((c) => !c.archived)
+    return filtered.sort((a, b) => a.name.localeCompare(b.name))
+  }, [includeArchived])
+}
+
+export function useGoals(): Goal[] | undefined {
+  return useLiveQuery(async () => {
+    const all = await db.goals.toArray()
+    return all.sort((a, b) => (a.status === b.status ? 0 : a.status === 'active' ? -1 : 1) || b.createdAt.localeCompare(a.createdAt))
+  }, [])
+}
+
+export function useGoalContributions(goalId: string | undefined): GoalContribution[] | undefined {
+  return useLiveQuery(async () => {
+    if (!goalId) return []
+    const rows = await db.goalContributions.where('goalId').equals(goalId).toArray()
+    return rows.sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : b.createdAt.localeCompare(a.createdAt)))
+  }, [goalId])
+}
+
+export function useDebts(): Debt[] | undefined {
+  return useLiveQuery(async () => {
+    const all = await db.debts.toArray()
+    return all.sort((a, b) => (a.status === b.status ? 0 : a.status === 'active' ? -1 : 1) || b.createdAt.localeCompare(a.createdAt))
+  }, [])
+}
+
+export function useDebtPayments(debtId: string | undefined): DebtPayment[] | undefined {
+  return useLiveQuery(async () => {
+    if (!debtId) return []
+    const rows = await db.debtPayments.where('debtId').equals(debtId).toArray()
+    return rows.sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : b.createdAt.localeCompare(a.createdAt)))
+  }, [debtId])
 }

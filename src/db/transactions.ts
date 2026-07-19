@@ -9,7 +9,7 @@ export interface AddTransactionInput {
   date?: string
   note?: string
   spendingItemId?: string
-  newItem?: { name: string; importance: Importance; icon: string; color: string; saveToLibrary: boolean }
+  newItem?: { name: string; importance: Importance; icon: string; color: string; saveToLibrary: boolean; categoryId?: string }
 }
 
 async function findPeriodIdForDate(date: string): Promise<string> {
@@ -27,6 +27,7 @@ export async function addTransaction(input: AddTransactionInput): Promise<void> 
   let spendingItemId = input.spendingItemId
   let itemName: string
   let importance: ImportanceOrUnclassified
+  let categoryId: string | undefined
 
   if (!spendingItemId && input.newItem?.saveToLibrary) {
     const id = makeId()
@@ -36,6 +37,7 @@ export async function addTransaction(input: AddTransactionInput): Promise<void> 
       importance: input.newItem.importance,
       icon: input.newItem.icon,
       color: input.newItem.color,
+      categoryId: input.newItem.categoryId,
       usageCount: 1,
       lastUsedAt: now,
       archived: false,
@@ -45,15 +47,18 @@ export async function addTransaction(input: AddTransactionInput): Promise<void> 
     spendingItemId = id
     itemName = input.newItem.name
     importance = input.newItem.importance
+    categoryId = input.newItem.categoryId
   } else if (!spendingItemId && input.newItem) {
     // One-off entry: keep the typed name + importance on the transaction only, no library row.
     itemName = input.newItem.name
     importance = input.newItem.importance
+    categoryId = input.newItem.categoryId
   } else if (spendingItemId) {
     const item = await db.spendingItems.get(spendingItemId)
     if (!item) throw new Error('Spending item not found')
     itemName = item.name
     importance = item.importance
+    categoryId = item.categoryId
     await db.spendingItems.update(spendingItemId, {
       usageCount: item.usageCount + 1,
       lastUsedAt: now,
@@ -73,6 +78,7 @@ export async function addTransaction(input: AddTransactionInput): Promise<void> 
     spendingItemId,
     itemNameSnapshot: itemName,
     importanceSnapshot: importance,
+    categoryIdSnapshot: categoryId,
     note: input.note,
     periodId,
     createdAt: now,

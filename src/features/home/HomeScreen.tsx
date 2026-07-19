@@ -1,17 +1,21 @@
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
-import { ChevronRight } from 'lucide-react'
+import { ChevronRight, PiggyBank, HandCoins } from 'lucide-react'
 import { Card } from '../../components/ui/Card'
 import { Pill } from '../../components/ui/Pill'
 import {
   useActivePeriod,
   useAllPeriods,
+  useDebts,
+  useGoals,
   useRecentTransactions,
   useSettingsState,
   useSpendingItems,
   useTransactionsForPeriod,
 } from '../../state/settingsQueries'
 import { computeRolledOverBudgets } from '../../domain/weeklyBudget'
+import { computeGoalProgress } from '../../domain/goals'
+import { computeDebtTotals } from '../../domain/debts'
 import { BankBalanceCard } from './BankBalanceCard'
 import { HeroBalanceCard } from './HeroBalanceCard'
 import { WeeklyBudgetCard } from './WeeklyBudgetCard'
@@ -28,6 +32,8 @@ export function HomeScreen() {
   const periodTransactions = useTransactionsForPeriod(activePeriod?.id)
   const recentTransactions = useRecentTransactions(6)
   const items = useSpendingItems()
+  const goals = useGoals()
+  const debts = useDebts()
 
   if (settingsState === 'loading' || settingsState === 'not-found' || !activePeriod) {
     return <div className="p-5 text-sm text-muted">{t('common.loading')}</div>
@@ -61,6 +67,12 @@ export function HomeScreen() {
   })
 
   const itemsById = new Map((items ?? []).map((i) => [i.id, { icon: i.icon, color: i.color }]))
+
+  const activeGoals = (goals ?? []).filter((g) => g.status === 'active')
+  const topGoal = activeGoals[0]
+  const topGoalProgress = topGoal ? computeGoalProgress(topGoal) : null
+  const debtTotals = computeDebtTotals(debts ?? [])
+  const hasDebts = (debts ?? []).some((d) => d.status === 'active')
 
   return (
     <div className="space-y-4 px-4 pt-[max(1.5rem,env(safe-area-inset-top))]">
@@ -100,6 +112,31 @@ export function HomeScreen() {
           </span>
         </Pill>
       </Link>
+
+      <div className="grid grid-cols-2 gap-3">
+        <Link to="/goals" className="flex flex-col gap-1 rounded-2xl bg-surface p-4">
+          <span className="flex items-center gap-1.5 text-xs font-medium text-muted">
+            <PiggyBank size={14} />
+            {t('nav.goals')}
+          </span>
+          {topGoal && topGoalProgress ? (
+            <span className="text-sm font-semibold tabular-nums">{topGoalProgress.pct}% · {topGoal.name}</span>
+          ) : (
+            <span className="text-sm font-semibold">{t('goals.addGoal')}</span>
+          )}
+        </Link>
+        <Link to="/debts" className="flex flex-col gap-1 rounded-2xl bg-surface p-4">
+          <span className="flex items-center gap-1.5 text-xs font-medium text-muted">
+            <HandCoins size={14} />
+            {t('nav.debts')}
+          </span>
+          {hasDebts ? (
+            <span className="text-sm font-semibold tabular-nums">{formatAmount(debtTotals.netPosition, currency, language)}</span>
+          ) : (
+            <span className="text-sm font-semibold">{t('debts.addDebt')}</span>
+          )}
+        </Link>
+      </div>
 
       {(items ?? []).length > 0 && <QuickAddGrid items={items ?? []} />}
 

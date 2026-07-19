@@ -1,4 +1,4 @@
-import type { Commitment } from '../domain/types'
+import type { Commitment, Debt } from '../domain/types'
 import { addDays, today } from '../utils/date'
 
 export async function requestNotificationPermission(): Promise<boolean> {
@@ -29,6 +29,24 @@ export function checkUpcomingCommitments(commitments: Commitment[]): void {
     if (localStorage.getItem(flagKey)) continue
 
     new Notification(c.name, { body: `${c.amount} — due ${dueKey}` })
+    localStorage.setItem(flagKey, '1')
+  }
+}
+
+/** Same one-per-due-date pattern as commitments, for debts that carry a due date. */
+export function checkUpcomingDebts(debts: Debt[]): void {
+  if (!('Notification' in window) || Notification.permission !== 'granted') return
+  const todayKey = today()
+  const horizonKey = addDays(todayKey, 2)
+
+  for (const d of debts) {
+    if (d.status !== 'active' || !d.dueDate) continue
+    if (d.dueDate < todayKey || d.dueDate > horizonKey) continue
+
+    const flagKey = `${NOTIFIED_KEY_PREFIX}debt:${d.id}:${d.dueDate}`
+    if (localStorage.getItem(flagKey)) continue
+
+    new Notification(d.name, { body: `${d.remainingAmount} — due ${d.dueDate}` })
     localStorage.setItem(flagKey, '1')
   }
 }

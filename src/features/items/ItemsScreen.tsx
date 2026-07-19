@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Plus, Search } from 'lucide-react'
+import { Plus, Search, Tags } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import { useSpendingItems } from '../../state/settingsQueries'
 import { DEFAULT_ICON, ICONS } from '../../icons/categoryIcons'
 import { Pill } from '../../components/ui/Pill'
@@ -43,14 +44,23 @@ export function ItemsScreen() {
           <h1 className="text-xl font-bold">{t('items.title')}</h1>
           <p className="mt-1 text-sm text-muted">{t('items.subtitle')}</p>
         </div>
-        <button
-          type="button"
-          onClick={openNew}
-          aria-label={t('items.addItem')}
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-ink text-bg"
-        >
-          <Plus size={20} />
-        </button>
+        <div className="flex items-center gap-2">
+          <Link
+            to="/categories"
+            aria-label={t('categories.title')}
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-surface-2"
+          >
+            <Tags size={18} />
+          </Link>
+          <button
+            type="button"
+            onClick={openNew}
+            aria-label={t('items.addItem')}
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-ink text-bg"
+          >
+            <Plus size={20} />
+          </button>
+        </div>
       </div>
 
       <div className="flex items-center gap-2 rounded-2xl border border-border bg-surface-2 px-4 py-3">
