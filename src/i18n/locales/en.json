@@ -91,7 +91,10 @@
     "parseMessage": "Parse message",
     "parseNoAmount": "Couldn't find an amount in that message",
     "parseNoMerchant": "Got the amount — pick or type the item yourself",
-    "saveToLibrary": "Save to my items list"
+    "saveToLibrary": "Save to my items list",
+    "category": "Category",
+    "autoDetected": "Auto",
+    "noCategory": "No category"
   },
   "items": {
     "title": "Spending Items",

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ClipboardPaste } from 'lucide-react'
+import { ClipboardPaste, Sparkles } from 'lucide-react'
 import { Sheet } from '../../components/ui/Sheet'
 import { AmountInput } from '../../components/ui/AmountInput'
 import { Pill } from '../../components/ui/Pill'
@@ -8,12 +8,13 @@ import { TextField } from '../../components/ui/TextField'
 import { Toggle } from '../../components/ui/Toggle'
 import { SearchableCombobox, type ComboboxItem } from '../../components/ui/SearchableCombobox'
 import { useUiStore } from '../../state/uiStore'
-import { useSettingsState, useSpendingItems } from '../../state/settingsQueries'
+import { useSettingsState, useSpendingItems, useCategories } from '../../state/settingsQueries'
 import { addTransaction } from '../../db/transactions'
 import { COLOR_SWATCHES, DEFAULT_ICON, ICONS } from '../../icons/categoryIcons'
 import { parseBankMessage } from '../../domain/parseBankMessage'
+import { classifyMerchant } from '../../domain/classifyMerchant'
 import { today } from '../../utils/date'
-import type { Importance } from '../../domain/types'
+import type { Category, Importance } from '../../domain/types'
 
 type Step = 'pick' | 'newItem'
 
@@ -32,6 +33,7 @@ export function AddExpenseSheet() {
   const showToast = useUiStore((s) => s.showToast)
   const settingsState = useSettingsState()
   const items = useSpendingItems()
+  const categories = useCategories()
 
   const [step, setStep] = useState<Step>('pick')
   const [amount, setAmount] = useState('')
@@ -40,12 +42,23 @@ export function AddExpenseSheet() {
   const [note, setNote] = useState('')
   const [newItemName, setNewItemName] = useState('')
   const [newItemImportance, setNewItemImportance] = useState<Importance>('important')
+  const [newItemCategoryId, setNewItemCategoryId] = useState<string | undefined>()
+  const [autoDetected, setAutoDetected] = useState(false)
   const [saveToLibrary, setSaveToLibrary] = useState(true)
   const [saving, setSaving] = useState(false)
   const [pasteOpen, setPasteOpen] = useState(false)
   const [pasteText, setPasteText] = useState('')
 
   const currency = settingsState !== 'loading' && settingsState !== 'not-found' ? settingsState.currency : ''
+
+  // Map a classifier icon-key guess onto whichever (non-archived) category
+  // carries that icon, so the link survives category renames/language switches.
+  function categoryIdForText(text: string | null | undefined): { categoryId?: string; importance?: Importance } {
+    const guess = classifyMerchant(text)
+    if (!guess) return {}
+    const match = (categories ?? []).find((c) => c.icon === guess.iconKey)
+    return { categoryId: match?.id, importance: guess.importance }
+  }
 
   const comboItems: ComboboxItem[] = useMemo(
     () =>
@@ -70,6 +83,8 @@ export function AddExpenseSheet() {
     setNote('')
     setNewItemName('')
     setNewItemImportance('important')
+    setNewItemCategoryId(undefined)
+    setAutoDetected(false)
     setSaveToLibrary(true)
     setPasteOpen(false)
     setPasteText('')
@@ -82,6 +97,13 @@ export function AddExpenseSheet() {
 
   function handleCreateNew(query: string) {
     setNewItemName(query)
+    // Auto-suggest a category + importance from the typed name too.
+    const guess = categoryIdForText(query)
+    if (guess.categoryId) {
+      setNewItemCategoryId(guess.categoryId)
+      if (guess.importance) setNewItemImportance(guess.importance)
+      setAutoDetected(true)
+    }
     setStep('newItem')
   }
 
@@ -97,8 +119,17 @@ export function AddExpenseSheet() {
     }
     setAmount(String(result.amount))
     setSelectedItemId(undefined)
+    // Classify from the extracted merchant first (strongest signal); fall back
+    // to the whole message when no merchant could be pulled out.
+    const guess = categoryIdForText(result.merchant ?? pasteText)
+    setNewItemCategoryId(guess.categoryId)
+    setNewItemImportance(guess.importance ?? 'important')
+    setAutoDetected(Boolean(guess.categoryId))
     if (result.merchant) {
       setNewItemName(result.merchant)
+      setStep('newItem')
+    } else if (guess.categoryId) {
+      // Amount + a recognised category, but no clean merchant name to show.
       setStep('newItem')
     } else {
       showToast(t('expense.parseNoMerchant'))
@@ -129,6 +160,7 @@ export function AddExpenseSheet() {
             importance: newItemImportance,
             icon: DEFAULT_ICON,
             color: colorForImportance(newItemImportance),
+            categoryId: newItemCategoryId,
             saveToLibrary,
           },
         })
@@ -225,6 +257,25 @@ export function AddExpenseSheet() {
               autoFocus
             />
             <div>
+              <div className="mb-1.5 flex items-center gap-2">
+                <span className="block text-sm font-medium text-ink-soft">{t('expense.category')}</span>
+                {autoDetected && (
+                  <span className="flex items-center gap-1 rounded-full bg-accent-soft px-2 py-0.5 text-[11px] font-medium text-accent-strong">
+                    <Sparkles size={11} />
+                    {t('expense.autoDetected')}
+                  </span>
+                )}
+              </div>
+              <CategoryChips
+                categories={categories}
+                selectedId={newItemCategoryId}
+                onSelect={(id) => {
+                  setNewItemCategoryId(id)
+                  setAutoDetected(false)
+                }}
+              />
+            </div>
+            <div>
               <span className="mb-1.5 block text-sm font-medium text-ink-soft">{t('items.importance')}</span>
               <div className="flex gap-2">
                 <Pill
@@ -281,6 +332,50 @@ export function AddExpenseSheet() {
         </Pill>
       </div>
     </Sheet>
+  )
+}
+
+function CategoryChips({
+  categories,
+  selectedId,
+  onSelect,
+}: {
+  categories: Category[] | undefined
+  selectedId: string | undefined
+  onSelect: (id: string | undefined) => void
+}) {
+  const { t } = useTranslation()
+  if (!categories || categories.length === 0) return null
+  return (
+    <div className="flex flex-wrap gap-2">
+      {categories.map((cat) => {
+        const Icon = ICONS[cat.icon] ?? ICONS[DEFAULT_ICON]
+        const active = cat.id === selectedId
+        return (
+          <button
+            key={cat.id}
+            type="button"
+            onClick={() => onSelect(active ? undefined : cat.id)}
+            className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition ${
+              active ? 'border-transparent text-white' : 'border-border text-ink-soft'
+            }`}
+            style={active ? { backgroundColor: cat.color } : undefined}
+          >
+            <Icon size={13} color={active ? '#fff' : cat.color} />
+            {cat.name}
+          </button>
+        )
+      })}
+      <button
+        type="button"
+        onClick={() => onSelect(undefined)}
+        className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${
+          selectedId === undefined ? 'border-ink bg-ink text-white' : 'border-border text-muted'
+        }`}
+      >
+        {t('expense.noCategory')}
+      </button>
+    </div>
   )
 }
 
