@@ -91,7 +91,10 @@
     "parseMessage": "تحليل الرسالة",
     "parseNoAmount": "ما قدرت ألقى مبلغاً في هذه الرسالة",
     "parseNoMerchant": "حصلت على المبلغ — اختر أو اكتب الصنف بنفسك",
-    "saveToLibrary": "حفظ في قائمة أصنافي"
+    "saveToLibrary": "حفظ في قائمة أصنافي",
+    "category": "الفئة",
+    "autoDetected": "تلقائي",
+    "noCategory": "بدون فئة"
   },
   "items": {
     "title": "الأصناف",
